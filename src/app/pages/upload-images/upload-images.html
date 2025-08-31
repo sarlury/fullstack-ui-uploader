@@ -36,11 +36,17 @@
                 <strong *ngIf="state()==='uploading'">Uploading…</strong>
                 <strong *ngIf="state()==='done'">Uploaded ✔</strong>
                 <strong *ngIf="state()==='error'">Failed ✖</strong>
-                <span class="name" *ngIf="fileName">{{ fileName }}</span>
+                @if(fileName) {
+                    <span class="name">{{ fileName }}</span>
+                }
             </div>
             <div class="actions">
-                <button class="ghost" *ngIf="state()==='uploading'" (click)="cancel()">✕</button>
-                <button class="ghost" *ngIf="state()==='error'" (click)="reset()">↻</button>
+                @if(state() === 'uploading') {
+                    <button class="ghost" (click)="cancel()">✕</button>
+                }
+                @if(state() === 'error') {
+                    <button class="ghost" (click)="reset()">↻</button>
+                }
             </div>
         </div>
         <div class="bar" *ngIf="state()!=='done'">

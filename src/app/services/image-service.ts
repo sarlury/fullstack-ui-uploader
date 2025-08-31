@@ -8,12 +8,16 @@ import { Images, ImagesRes } from '../pages/utils/images';
 })
 export class ImageService {
 
-  url = 'http://localhost:3000/image'
+  url = 'http://localhost:3000/image';
 
   private http = inject(HttpClient);
 
-  uploadImages(body: Images): Observable<ImagesRes> {
-    return this.http.post<ImagesRes>(this.url, body);
-  }
+  uploadImages(file: File): Observable<ImagesRes> {
+  const form = new FormData();
+  form.append('file', file);
+
+  return this.http.post<ImagesRes>(this.url, form);
+}
+
   
 }

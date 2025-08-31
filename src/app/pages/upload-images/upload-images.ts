@@ -1,5 +1,6 @@
 import { CommonModule, NgIf } from '@angular/common';
-import { Component, ElementRef, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { ImageService } from '../../services/image-service';
 
 @Component({
   selector: 'app-upload-images',
@@ -8,9 +9,8 @@ import { Component, ElementRef, signal, ViewChild } from '@angular/core';
   styleUrl: './upload-images.scss'
 })
 export class UploadImages {
-
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
-
+  private imageService = inject(ImageService);
   dragging = signal(false);
   progress = signal(0);
   state = signal<'idle'|'uploading'|'done'|'error'>('idle');
@@ -18,7 +18,6 @@ export class UploadImages {
   errorMsg = '';
   private abort?: AbortController;
 
-  // drag&drop handlers
   onDragOver(e: DragEvent) { e.preventDefault(); this.dragging.set(true); }
   onDragLeave(e: DragEvent) { e.preventDefault(); this.dragging.set(false); }
   onDrop(e: DragEvent) {
@@ -46,29 +45,16 @@ export class UploadImages {
     this.progress.set(0);
     this.state.set('uploading');
 
-    // support cancel
     this.abort = new AbortController();
 
-    // this.http.post('http://localhost:3000/image', form, {
-    //   observe: 'events',
-    //   reportProgress: true,
-    //   signal: this.abort.signal
-    // }).subscribe({
-    //   next: (ev) => {
-    //     if (ev.type === HttpEventType.UploadProgress && ev.total) {
-    //       const pct = Math.round((ev.loaded / ev.total) * 100);
-    //       this.progress.set(pct);
-    //     } else if (ev.type === HttpEventType.Response) {
-    //       this.progress.set(100);
-    //       this.state.set('done');
-    //     }
-    //   },
-    //   error: (err) => {
-    //     if (err.name === 'AbortError') return; // cancelled
-    //     this.errorMsg = err?.error?.error || err.message || 'Upload failed';
-    //     this.state.set('error');
-    //   }
-    // });
+    this.imageService.uploadImages(file).subscribe({
+      next: (res) => {
+        console.log('res', res)
+      },
+      error: (err) => {
+        console.log('err', err)
+      }
+    })
   }
 
   cancel() {
